@@ -37,7 +37,7 @@ class Response {
      * @return array|null
      */
     public function getData(): ?array {
-        return $this->body ?? null;
+        return $this->body['data'] ?? null;
     }
 
     /**
