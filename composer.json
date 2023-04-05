@@ -1,0 +1,42 @@
+{
+  "name": "rapideinternet/postcodeapi.client",
+  "version": "1.0.0",
+  "description": "PostcodeAPI client package",
+  "keywords": [],
+  "homepage": "https://github.com/rapideinternet/postcodeapi.client",
+  "license": "MIT",
+  "authors": [{
+    "name": "Brad Johnson",
+    "email": "erk@rapide.software",
+    "role": "Developer"
+  }],
+  "require": {
+    "php": "^8.1",
+    "guzzlehttp/guzzle": "^7.5",
+    "illuminate/support": "^9.52",
+    "symfony/symfony": "^6.2"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^9.6"
+  },
+  "autoload": {
+    "psr-4": {
+      "RapideInternet\\PostcodeAPI\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+    }
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "preferred-install": "dist",
+    "sort-packages": true
+  },
+  "extra": {
+    "laravel": {
+    }
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
