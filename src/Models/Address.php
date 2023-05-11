@@ -6,8 +6,8 @@ class Address implements \RapideInternet\PostcodeAPI\Interfaces\Address {
 
     public string $street_name;
     public string $street_number;
-    public string $street_number_addition;
-    public string $street_number_letter;
+    public ?string $street_number_addition;
+    public ?string $street_number_letter;
     public string $postal_code;
     public string $city;
     public string $province;
@@ -22,6 +22,8 @@ class Address implements \RapideInternet\PostcodeAPI\Interfaces\Address {
         $this->postal_code = $data['postcode'];
         $this->street_number = $data['number'];
         $this->street_name = $data['street'];
+        $this->street_number_addition = null;
+        $this->street_number_letter = null;
         $this->city = $data['city'];
         $this->municipality = $data['municipality'];
         $this->province = $data['province'];

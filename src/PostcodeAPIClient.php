@@ -27,7 +27,7 @@ class PostcodeAPIClient extends BaseClient {
      * @param string $api_key
      * @return void
      */
-    public function setApiKey(string $api_key) {
+    public function setApiKey(string $api_key): void {
         $this->api_key = $api_key;
     }
 
