@@ -4,7 +4,7 @@ namespace RapideInternet\PostcodeAPI;
 
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 
-class Response {
+class Response implements ResponseInterface {
 
     protected int $status_code;
     protected ?array $body;
@@ -62,9 +62,37 @@ class Response {
     }
 
     /**
+     * @return string
+     */
+    public function toJson(): string {
+        return json_encode(['status_code' => $this->status_code, 'message' => $this->message, 'body' => $this->body]);
+    }
+
+    /**
      * @return bool
      */
     public function isValid(): bool {
         return $this->getStatusCode() >= HttpResponse::HTTP_OK && $this->getStatusCode() <= HttpResponse::HTTP_IM_USED;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isRedirect(): bool {
+        return $this->getStatusCode() >= HttpResponse::HTTP_MOVED_PERMANENTLY && $this->getStatusCode() <= HttpResponse::HTTP_PERMANENTLY_REDIRECT;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isInvalid(): bool {
+        return $this->getStatusCode() >= HttpResponse::HTTP_BAD_REQUEST && $this->getStatusCode() <= HttpResponse::HTTP_UNAVAILABLE_FOR_LEGAL_REASONS;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isServerError(): bool {
+        return $this->getStatusCode() >= HttpResponse::HTTP_INTERNAL_SERVER_ERROR;
     }
 }

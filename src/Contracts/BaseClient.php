@@ -10,7 +10,9 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use RapideInternet\PostcodeAPI\Exceptions\Exception;
 use RapideInternet\PostcodeAPI\Exceptions\NotFoundException;
+use RapideInternet\PostcodeAPI\Exceptions\BadGateWayException;
 use RapideInternet\PostcodeAPI\Exceptions\ForbiddenException;
+use RapideInternet\PostcodeAPI\Exceptions\TooManyRequests;
 use RapideInternet\PostcodeAPI\Exceptions\BadRequestException;
 use Symfony\Component\HttpFoundation\Response as HttpResponse;
 use RapideInternet\PostcodeAPI\Exceptions\UnauthorizedException;
@@ -22,6 +24,7 @@ use RapideInternet\PostcodeAPI\Exceptions\InternalServerErrorException;
 abstract class BaseClient {
 
     private Client $client;
+    protected array $clients = [];
 
     /**
      * Constructor
@@ -86,12 +89,14 @@ abstract class BaseClient {
                 ? new InternalServerErrorException($e)
                 : match($response->getStatusCode()) {
                     HttpResponse::HTTP_BAD_REQUEST => new BadRequestException($e),
-                    HttpResponse::HTTP_FORBIDDEN => new ForbiddenException($e),
-                    HttpResponse::HTTP_INTERNAL_SERVER_ERROR => new InternalServerErrorException($e),
-                    HttpResponse::HTTP_NOT_FOUND => new NotFoundException($e),
-                    HttpResponse::HTTP_SERVICE_UNAVAILABLE => new ServiceUnavailableException($e),
                     HttpResponse::HTTP_UNAUTHORIZED => new UnauthorizedException($e),
+                    HttpResponse::HTTP_FORBIDDEN => new ForbiddenException($e),
+                    HttpResponse::HTTP_NOT_FOUND => new NotFoundException($e),
+                    HttpResponse::HTTP_TOO_MANY_REQUESTS => new TooManyRequests($e),
                     HttpResponse::HTTP_UNPROCESSABLE_ENTITY => new UnprocessableEntityException($e),
+                    HttpResponse::HTTP_INTERNAL_SERVER_ERROR => new InternalServerErrorException($e),
+                    HttpResponse::HTTP_BAD_GATEWAY => new BadGateWayException($e),
+                    HttpResponse::HTTP_SERVICE_UNAVAILABLE => new ServiceUnavailableException($e),
                     default => new NotImplementedException($e)
             };
         }
@@ -120,4 +125,38 @@ abstract class BaseClient {
      * @return array
      */
     public abstract function getHeaders(): array;
+
+    /**
+     * @param $method
+     * @param $arguments
+     * @return mixed
+     * @throws \Exception
+     */
+    public function __call($method, $arguments) {
+        if(!isset($this->clients[$method]) && !method_exists($this, $method)) {
+            throw new \Exception("Unknown method [$method]");
+        }
+        elseif(method_exists($this, $method)) {
+            return call_user_func([$this, $method], $arguments);
+        }
+        elseif(isset($this->clients[$method])) {
+            return new $this->clients[$method]($this);
+        }
+        throw new \Exception("Unknown method [$method]");
+    }
+
+    /**
+     * @param $property
+     * @return mixed
+     * @throws \Exception
+     */
+    public function __get($property){
+        if(property_exists($this, $property)) {
+            return $this->{$property};
+        }
+        elseif(isset($this->clients[$property])) {
+            return new $this->clients[$property]($this);
+        }
+        throw new \Exception("Unknown property [$property]");
+    }
 }

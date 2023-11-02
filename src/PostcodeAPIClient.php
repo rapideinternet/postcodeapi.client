@@ -5,8 +5,10 @@ namespace RapideInternet\PostcodeAPI;
 use Psr\Http\Message\ResponseInterface;
 use RapideInternet\PostcodeAPI\Clients\AddressClient;
 use RapideInternet\PostcodeAPI\Contracts\BaseClient;
-use Exception;
 
+/**
+ * @property AddressClient $address
+ */
 class PostcodeAPIClient extends BaseClient {
 
     protected string $url = 'https://api.postcodeapi.nu/v3';
@@ -60,39 +62,5 @@ class PostcodeAPIClient extends BaseClient {
             'X-Api-Key' => $this->getApiKey(),
             'Content-Type' => 'application/json'
         ];
-    }
-
-    /**
-     * @param $method
-     * @param $arguments
-     * @return mixed
-     * @throws Exception
-     */
-    public function __call($method, $arguments) {
-        if(!isset($this->clients[$method]) && !method_exists($this, $method)) {
-            throw new Exception("Unknown method [$method]");
-        }
-        elseif(method_exists($this, $method)) {
-            return call_user_func([$this, $method], $arguments);
-        }
-        elseif(isset($this->clients[$method])) {
-            return new $this->clients[$method]($this);
-        }
-        throw new Exception("Unknown method [$method]");
-    }
-
-    /**
-     * @param $property
-     * @return mixed
-     * @throws Exception
-     */
-    public function __get($property){
-        if(property_exists($this, $property)) {
-            return $this->{$property};
-        }
-        elseif(isset($this->clients[$property])) {
-            return new $this->clients[$property]($this);
-        }
-        throw new Exception("Unknown property [$property]");
     }
 }
