@@ -12,8 +12,8 @@ class Address implements \RapideInternet\PostcodeAPI\Interfaces\Address {
     public string $city;
     public string $province;
     public string $municipality;
-    public int $latitude;
-    public int $longitude;
+    public float $latitude;
+    public float $longitude;
 
     /**
      * @param array $data
